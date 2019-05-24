@@ -1,0 +1,204 @@
+openapi: 3.0.1
+info:
+  title: MagIC API
+  description: 
+    The OpenAPI definition for EarthRef.org''s MagIC API.<br/><br/>
+    Requests requiring authentication should include the ''api_key'' query parameter with a value of an active EarthRef.org API key.
+  contact:
+    email: magic@earthref.org
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  version: '0.1'
+externalDocs:
+  description: Magnetics Information Consortium (MagIC)
+  url: https://earthref.org/MagIC/
+servers:
+- url: https://api.earthref.org/MagIC/v0.1
+
+paths:
+  /contribution/{id}:
+    get:
+      tags:
+      - Activated Contributions
+      summary: Retrieve a public contribution MagIC text file
+      operationId: getContributionByID
+      parameters:
+      - name: id
+        in: path
+        description: Contribution ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      responses:
+        200:
+          description: Contribution is returned in the format requested by the accept header
+          content:
+            application/json:
+              schema:
+                example:
+                  contribution:
+                    id: 10747
+                    version: 6
+                    timestamp: '2015-07-09T02:20:01.000Z'
+                    contributor: '@magic'
+                    data_model_version: '3.0'
+                    reference: '10.1029/93JB00024'
+                  locations: [
+                    location: Hawaii
+                  ]
+            text/plain:
+              schema:
+                example: 
+                  tab delimited	contribution
+                  
+                  id	version	timestamp	contributor	data_model_version	reference
+                  
+                  10747	6	2015-07-09T02:20:01.000Z	@magic	3.0	10.1029/93JB00024
+                  
+                  >>>>>>>>>>
+                  
+                  tab delimited	locations
+                  
+                  location
+                  
+                  Hawaii
+        404:
+          description: Contribution ID not found in the private workspace
+          content: {}
+  /private-contribution/{id}:
+    get:
+      tags:
+      - Private Contributions
+      summary: Retrieve a contribution MagIC text file from your private workspace
+      operationId: getPrivateContributionByID
+      parameters:
+      - name: id
+        in: path
+        description: Contribution ID
+        required: true
+        schema:
+          type: integer
+      - name: format
+        in: query
+        description: Response format
+        schema:
+          type: string
+          default: text
+          enum:
+          - text
+          - json
+          - excel
+      responses:
+        401:
+          description: Unauthorized to access this private workspace
+          content: {}
+        404:
+          description: Contribution ID not found in the private workspace
+          content: {}
+      security:
+      - api_key: []
+  /private-contribution:
+    post:
+      tags:
+      - Private Contributions
+      summary: Upload a text or Excel file to a new contribution in your private workspace
+      operationId: postPrivateContribution
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                table:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Accepted for upload with job ID in the response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+            text/plain:
+              schema:
+                example: '16fd2706-8baf-433b-82eb-8c7fada847da'
+        400:
+          description: Failed to create a job to process the upload
+          content:
+            text/plain:
+              schema:
+                example: 'Table name not defined in request body or file'
+        401:
+          description: Unauthorized to access this private workspace
+          content: {}
+      security:
+      - api_key: []
+components:
+  schemas:
+    Job:
+      required:
+      - job
+      - id
+      - status
+      type: object
+      properties:
+        job:
+          description: UUID v4 unique identifier for the job
+          type: string
+          example: '16fd2706-8baf-433b-82eb-8c7fada847da'
+        id:
+          description: ID for the contribution on which the job is working
+          type: integer
+          format: int64
+          minimum: 0
+          example: '16432'
+        status:
+          description: Job status
+          type: string
+          enum:
+          - queued
+          - processing
+          - success
+          - error
+          example: success
+        started:
+          description: RFC3389 date/time when the job started
+          type: string
+          format: date-time
+          example: '2019-05-23T18:13:17+00:00'
+        run_time:
+          description: Run time length for the job in milliseconds
+          type: integer
+          format: int64
+          minimum: 0
+          example: 32415
+        progress:
+          description: Percent complete
+          type: number
+          format: float
+          minimum: 0
+          example: 36.2
+        message:
+          description: Job status message
+          type: string
+          example: 'Queued for processing'
+        description:
+          description: Description of the work being done
+          type: string
+          example: ''
+        children:
+          description: Array of child job unique identifiers
+          type: array
+          items:
+            type: string
+          example: ['770f5c52-9975-4886-be15-b549a9b10293', '86e01c84-53f8-4cdd-bf67-8701aa5c9e11']
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: query
