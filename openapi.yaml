@@ -68,6 +68,29 @@ paths:
         404:
           description: Contribution ID not found in the private workspace
           content: {}
+  /job/{id}:
+    get:
+      tags:
+      - EarthRef
+      summary: Retrieve job status
+      operationId: getJobByID
+      parameters:
+      - name: id
+        in: path
+        description: Job ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Job status is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        404:
+          description: Job ID not found
+          content: {}
   /private-contribution/{id}:
     get:
       tags:
