@@ -17,7 +17,7 @@ servers:
 - url: https://api.earthref.org/MagIC/v0.1
 
 paths:
-  /contribution/{id}:
+  /contributions/{id}:
     get:
       tags:
       - Activated Contributions
@@ -30,7 +30,6 @@ paths:
         required: true
         schema:
           type: integer
-          format: int64
           minimum: 0
       responses:
         200:
@@ -177,7 +176,6 @@ components:
         id:
           description: ID for the contribution on which the job is working
           type: integer
-          format: int64
           minimum: 0
           example: '16432'
         status:
@@ -197,13 +195,11 @@ components:
         run_time:
           description: Run time length for the job in milliseconds
           type: integer
-          format: int64
           minimum: 0
           example: 32415
         progress:
           description: Percent complete
           type: number
-          format: float
           minimum: 0
           example: 36.2
         message:
