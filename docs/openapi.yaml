@@ -20,7 +20,7 @@ paths:
   /contributions/{id}:
     get:
       tags:
-      - Activated Contributions
+      - Public Contributions
       summary: Retrieve a public contribution MagIC text file
       operationId: getContributionByID
       parameters:
@@ -45,9 +45,79 @@ paths:
                     contributor: '@magic'
                     data_model_version: '3.0'
                     reference: '10.1029/93JB00024'
-                  locations: [
+                  locations: [{
                     location: Hawaii
-                  ]
+                  }]
+            text/plain:
+              schema:
+                example: 
+                  tab delimited	contribution
+                  
+                  id	version	timestamp	contributor	data_model_version	reference
+                  
+                  10747	6	2015-07-09T02:20:01.000Z	@magic	3.0	10.1029/93JB00024
+                  
+                  >>>>>>>>>>
+                  
+                  tab delimited	locations
+                  
+                  location
+                  
+                  Hawaii
+        404:
+          description: Contribution ID not found in the private workspace
+          content: {}
+  /search/{table}:
+    get:
+      tags:
+      - Public Search
+      summary: Retrieve public records
+      operationId: getSearchByTable
+      parameters:
+      - name: table
+        in: path
+        description: Record type
+        required: true
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: Max number of records to return
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 10000
+      - name: from
+        in: query
+        description: Starting record number for paging
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: query
+        in: query
+        description: Search query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: Contribution is returned in the format requested by the accept header
+          content:
+            application/json:
+              schema:
+                example:
+                  contribution:
+                    id: 10747
+                    version: 6
+                    timestamp: '2015-07-09T02:20:01.000Z'
+                    contributor: '@magic'
+                    data_model_version: '3.0'
+                    reference: '10.1029/93JB00024'
+                  locations: [{
+                    location: Hawaii
+                  }]
             text/plain:
               schema:
                 example: 
