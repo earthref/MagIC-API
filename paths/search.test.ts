@@ -34,4 +34,16 @@ describe('MagIC API - Search', () => {
     expect(res.data.results.length).toBeLessThanOrEqual(res.data.size);
   });
 
+  test('GET /search/contributions returns 5 or less results', async () => {
+    const res = await client.get('/search/contributions?size=5');
+    expect(res.status).toBe(200);
+    expect(res.data).toHaveProperty('total');
+    expect(res.data).toHaveProperty('size');
+    expect(res.data.size).toBeLessThanOrEqual(5);
+    expect(res.data).toHaveProperty('from');
+    expect(res.data.from).toBe(0);
+    expect(res.data).toHaveProperty('results');
+    expect(res.data.results.length).toBeLessThanOrEqual(res.data.size);
+  });
+
 });

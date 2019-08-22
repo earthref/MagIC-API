@@ -4,7 +4,7 @@ import { Context as OpenAPIContext } from 'openapi-backend/backend';
 import Koa from 'koa';
 import KoaBodyparser from 'koa-bodyparser';
 
-import contributions from './paths/contributions';
+import contribution from './paths/contribution';
 import search from './paths/search';
 
 const API = new Koa();
@@ -12,9 +12,9 @@ API.use(KoaBodyparser());
 
 // Define API
 const server = new OpenAPIBackend({
-  definition: path.join(__dirname, 'docs', 'openapi.yaml'),
+  definition: path.join(__dirname, process.env.NODE_ENV === 'development' ? '..' : '', 'docs', 'openapi.yaml'),
   handlers: {
-    ... contributions,
+    ... contribution,
     ... search,
     validationFail: async (c: OpenAPIContext, ctx: Koa.Context) => {
       ctx.body = { err: c.validation.errors };

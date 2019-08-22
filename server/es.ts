@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Client, RequestParams, ApiResponse } from '@elastic/elasticsearch';
 
 const index = 'magic_v4';
@@ -45,7 +46,7 @@ interface SearchResponse {
 }
 
 // Check the ES connection status
-async function checkConnection() {
+async function esCheckConnection() {
   let isConnected = false;
   while (!isConnected) {
     console.log('Connecting to ES');
@@ -58,37 +59,10 @@ async function checkConnection() {
     }
   }
 }
-export { checkConnection };
-
-// Get public contribution by ID
-async function getContributionByID(id: string) {
-  const params: RequestParams.Search = {
-    index,
-    type: 'contribution',
-    body: {
-      query: {
-        bool: {
-          must: [{
-            term: {
-              'summary.contribution.id': id,
-            },
-          }, {
-            term: {
-              'summary.contribution._is_activated': true,
-            },
-          }],
-        },
-      },
-    },
-  };
-
-  const resp: ApiResponse<SearchResponse> = await client.search(params);
-  return resp.body.hits.total > 0 && resp.body.hits.hits[0]._source.contribution || undefined;
-}
-export { getContributionByID };
+export { esCheckConnection };
 
 // Search public contributions
-async function getSearchByTable(
+async function esGetSearchByTable(
   { table = 'contribution', size = 10, from = 0, query = '' }:
   { table?: string, size?: number, from?: number, query?: string } = {},
 ) {
@@ -98,6 +72,9 @@ async function getSearchByTable(
     size,
     from,
     body: {
+      sort: {
+        'summary.contribution.timestamp': 'desc',
+      },
       query: {
         bool: {
           must: [query && {
@@ -115,12 +92,17 @@ async function getSearchByTable(
   };
 
   const resp: ApiResponse<SearchResponse> = await client.search(params);
-  return resp.body.hits.total > 0 && {
+  if (resp.body.hits.total <= 0) { return undefined; }
+  const results = table !== 'contribution' ?
+    resp.body.hits.hits.map((hit) => hit._source.rows) :
+    resp.body.hits.hits.map((hit) =>
+      [_.omitBy(hit._source.summary.contribution, (_: any, k: string) => k[0] === '_')]);
+  return {
     total: resp.body.hits.total,
     size,
     from,
     query,
-    results: resp.body.hits.hits.map((x) => x._source.contribution),
-  } || undefined;
+    results,
+  };
 }
-export { getSearchByTable };
+export { esGetSearchByTable };
