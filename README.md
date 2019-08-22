@@ -14,12 +14,12 @@ The deployed API is currently available at http://api.earthref.org/MagIC/v0 with
 - http://api.earthref.org/MagIC/v0/contribution/16645
 
 These requests can also be made with an HTTP request client, for example getting a contribution with Python:
-```
+```python
 import requests
 
 # Get the 50 latest sites in MagIC
 response = requests.get(
-    'http://api.earthref.org/MagIC/v0/contribution/16665',
+    'http://api.earthref.org/MagIC/v0/contribution/16663',
     headers={'Accept': 'text/plain'}
 )
 
@@ -33,7 +33,7 @@ if (response.status_code == 204):
 print(response.content[0:100])
 ```
 Or searching with Python:
-```
+```python
 import requests
 import pandas
 
