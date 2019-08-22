@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10  
+    commands:
+      - echo Installing Jest...
+      - npm install -g jest
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - echo Build started on `date`
+      - npm run build
+      - echo Testing with Jest
+      - npm run test
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - dist/*
+    - docs/*
