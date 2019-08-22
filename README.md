@@ -13,8 +13,26 @@ The deployed API is currently available at http://api.earthref.org/MagIC/v0 with
 #### Get contribution 16645 in MagIC Text File format:
 - http://api.earthref.org/MagIC/v0/contribution/16645
 
-These requests can also be made with an HTTP request client, for example with Python:
+These requests can also be made with an HTTP request client, for example getting a contribution with Python:
+```
+import requests
 
+# Get the 50 latest sites in MagIC
+response = requests.get(
+    'http://api.earthref.org/MagIC/v0/contribution/16665',
+    headers={'Accept': 'text/plain'}
+)
+
+# Check the response status code
+if (response.status_code == 404):
+  print('Request URL is incorrect.')
+if (response.status_code == 204):
+  print('Contribution ID doesn''t exist.')
+  
+# Parse the first 100 characters of the contribution
+print(response.content[0:100])
+```
+Or searching with Python:
 ```
 import requests
 import pandas
@@ -25,6 +43,10 @@ response = requests.get(
     params={'query': 'devonian', 'size': 50},
     headers={'Accept': 'application/json'}
 )
+
+# Check the response status code
+if (response.status_code == 404):
+  print('Request URL is incorrect.')
 
 # Parse the JSON output into a dictionary
 json_response = response.json()
@@ -40,7 +62,6 @@ sites_rows = flatten(sites)
 sites_df = pandas.DataFrame(sites_rows)
 sites_df.head()
 ```
-
 
 ## Development
 
