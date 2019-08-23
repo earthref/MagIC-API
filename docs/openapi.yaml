@@ -14,10 +14,10 @@ externalDocs:
   description: Magnetics Information Consortium (MagIC)
   url: https://earthref.org/MagIC/
 servers:
-- url: https://api.earthref.org/MagIC/v0.1
+- url: https://api.earthref.org/MagIC/v0
 
 paths:
-  /contribution/{id}:
+  /MagIC/v0/contribution/{id}:
     get:
       tags:
       - Public Contribution
@@ -55,7 +55,7 @@ paths:
         204:
           description: Contribution ID not found
           content: {}
-  /search/{table}:
+  /MagIC/v0/search/{table}:
     get:
       tags:
       - Public Search

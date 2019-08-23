@@ -3,6 +3,7 @@ import OpenAPIBackend from 'openapi-backend';
 import { Context as OpenAPIContext } from 'openapi-backend/backend';
 import Koa from 'koa';
 import KoaBodyparser from 'koa-bodyparser';
+import json from 'koa-json';
 
 import contribution from './paths/contribution';
 import search from './paths/search';
@@ -12,7 +13,7 @@ API.use(KoaBodyparser());
 
 // Define API
 const server = new OpenAPIBackend({
-  definition: path.join(__dirname, process.env.NODE_ENV === 'development' ? '..' : '', 'docs', 'openapi.yaml'),
+  definition: path.join(__dirname, '..', 'docs', 'openapi.yaml'),
   handlers: {
     ... contribution,
     ... search,
@@ -35,6 +36,9 @@ const server = new OpenAPIBackend({
   },
 });
 server.init();
+
+// Pretty print JSON output
+API.use(json());
 
 // Use API as Koa middleware
 API.use((ctx) =>
