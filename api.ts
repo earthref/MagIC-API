@@ -4,6 +4,7 @@ import { Context as OpenAPIContext } from 'openapi-backend/backend';
 import Koa from 'koa';
 import KoaBodyparser from 'koa-bodyparser';
 import json from 'koa-json';
+import logger from 'koa-logger';
 
 import contribution from './paths/contribution';
 import search from './paths/search';
@@ -36,6 +37,9 @@ const server = new OpenAPIBackend({
   },
 });
 server.init();
+
+// Log requests
+API.use(logger());
 
 // Pretty print JSON output
 API.use(json());
